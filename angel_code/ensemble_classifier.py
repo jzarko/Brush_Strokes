@@ -21,7 +21,9 @@ class EnsembleClassifier:
             model_dir = os.path.join(working_dir, name)
             if os.path.isdir(model_dir):
                 self.trained_models[name] = models.load_model(model_dir)
-                print(f'Loaded model: {name}')
+                print(f'LOADING MODEL: {name}\n')
+                self.trained_models[name].summary()
+                print('')
             else:
                 print(f"Invalid model name {name}")
         pass
@@ -95,7 +97,7 @@ class EnsembleClassifier:
     
 
     def plot_image(self, image, label):
-        plt.figure(figsize=(1, 2))
+        plt.figure(figsize=(3, 3))
         plt.imshow(image)
         plt.title(label)
         plt.axis("off")
@@ -122,6 +124,6 @@ if __name__ == "__main__":
 
     my_ensemble_model = EnsembleClassifier('.\\Code')
     my_ensemble_model.demo(new_kkanji_midterm_dataset_val)
-    print()
+    # print()
     # my_ensemble_model.validate(new_kkanji_midterm_dataset_val)
     # 95.63 accuracy 
