@@ -3,6 +3,7 @@
 #   classification to acheieves 93.5% accuracy for this model.
 
 # Best base model implementation (optuna has not found an optimal base)
+# val_accuracy: 0.9127
 k49_shape = (28, 28, 1)
 num_classes = 49
 
@@ -33,25 +34,45 @@ def load_base_model():
     return bm
 
 
+# ==============================================================================
 # NO OPTUNA: Transfer learning top model with unoptimized hyperparameters
-
-# OPTUNA: Transfer learning top model for the optimal optuna hyperparameters
+# val_accuracy: 0.9241
 kshape = (28, 28, 1)
 
 final_base = load_base_model()
 
-justin_tl_model = Sequential()
-justin_tl_model.add(final_base)
-justin_tl_model.add(Conv2D(63, (3, 3), activation='sigmoid', input_shape=kshape))
-justin_tl_model.add(AveragePooling2D((2, 2)))
-justin_tl_model.add(Dropout(0.2))
-justin_tl_model.add(Conv2D(36, (3, 3), activation='sigmoid', input_shape=kshape))
-justin_tl_model.add(Flatten())
-justin_tl_model.add(Dense(152, activation='tanh'))
-justin_tl_model.add(Dense(150))
+justin_basic_tl_model = Sequential()
+justin_basic_tl_model.add(tl_base)                              # Base..
+justin_basic_tl_model.add(Conv2D(48, (3, 3), activation='sigmoid', input_shape=kshape))
+justin_basic_tl_model.add(AveragePooling2D(pool_size=(2, 2)))
+justin_basic_tl_model.add(Dropout(0.2))
+justin_basic_tl_model.add(Conv2D(32, (3, 3), activation='sigmoid'))
+justin_basic_tl_model.add(Flatten())
+justin_basic_tl_model.add(Dense(150, activation='relu'))
+justin_basic_tl_model.add(Dense(150))
 
-justin_tl_model.compile(optimizer='adam',
+justin_basic_tl_model.summary()
+
+
+# ==============================================================================
+# OPTUNA: Transfer learning top model for the optimal optuna hyperparameters
+# val_accuracy: 0.9368
+kshape = (28, 28, 1)
+
+final_base = load_base_model()
+
+justin_optuna_tl_model = Sequential()
+justin_optuna_tl_model.add(final_base)
+justin_optuna_tl_model.add(Conv2D(63, (3, 3), activation='sigmoid', input_shape=kshape))
+justin_optuna_tl_model.add(AveragePooling2D((2, 2)))
+justin_optuna_tl_model.add(Dropout(0.2))
+justin_optuna_tl_model.add(Conv2D(36, (3, 3), activation='sigmoid', input_shape=kshape))
+justin_optuna_tl_model.add(Flatten())
+justin_optuna_tl_model.add(Dense(152, activation='tanh'))
+justin_optuna_tl_model.add(Dense(150))
+
+justin_optuna_tl_model.compile(optimizer='adam',
               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
               metrics=[tf.keras.metrics.SparseCategoricalCrossentropy(), 'accuracy'])
 
-justin_tl_model.summary()
+justin_optuna_tl_model.summary()
